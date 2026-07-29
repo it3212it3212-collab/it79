@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>자료 다운로드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg: #0f1320;
+      --bg-soft: #131728;
+      --card: rgba(255,255,255,0.06);
+      --text: #e6e8ef;
+      --muted: #a6aec9;
+      --primary: #7aa7ff;
+      --primary-2: #9b7bff;
+      --ring: 0 0 0 6px rgba(123, 168, 255, .18);
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+      --glass-border: 1px solid rgba(255,255,255,.12);
+      --btn-grad: linear-gradient(135deg, #7aa7ff, #9b7bff);
+      --btn-hover: linear-gradient(135deg, #6997ff, #8a6aff);
+      --accent: #8ad0ff;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Pretendard','Noto Sans KR',system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(123,168,255,.18), transparent 60%),
+        radial-gradient(1000px 500px at 0% 0%, rgba(155,123,255,.18), transparent 60%),
+        var(--bg);
+      line-height:1.6;
+    }
+
+    /* 헤더 */
+    .header{
+      position:relative;
+      padding:72px 24px 48px;
+      text-align:center;
+      overflow:hidden;
+    }
+    .header::before{
+      content:"";
+      position:absolute; inset: -40% -20% auto -20%;
+      height: 120%;
+      background: radial-gradient(1000px 600px at 50% 10%, rgba(138,208,255,.25), transparent 60%),
+                  radial-gradient(900px 500px at 50% 0%, rgba(123,168,255,.22), transparent 60%);
+      filter: blur(40px);
+      z-index:0;
+    }
+    /* 제목: 그라데이션 제거(단색) + 강한 그림자 */
+    .title{
+      position:relative; z-index:1;
+      font-size: clamp(34px, 4vw, 50px);
+      letter-spacing:-.02em;
+      font-weight:900;
+      margin:0 0 10px;
+      color:#ffffff;                      /* 단색 흰색 */
+      text-shadow: 0 3px 8px rgba(0,0,0,.55); /* 강한 그림자 */
+    }
+    .subtitle{
+      position:relative; z-index:1;
+      color:var(--muted);
+      font-size:16px;
+      margin:0;
+    }
+
+    /* 컨테이너 & 카드 */
+    .container{max-width:1100px; margin: 0 auto; padding: 0 24px 60px;}
+    .card{
+      backdrop-filter: saturate(140%) blur(10px);
+      background: var(--card);
+      border: var(--glass-border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      margin: 18px 0;
+      position:relative;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 50px rgba(0,0,0,.22);
+      border-color: rgba(255,255,255,.22);
+    }
+    .card h2{
+      display:flex; align-items:center; gap:12px;
+      font-size:20px; margin:0 0 18px;
+      letter-spacing:-.01em;
+      color: var(--primary);
+    }
+
+    /* 버튼 그리드 & 버튼 */
+    .btn-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+      gap:12px;
+    }
+    .btn{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding:14px 16px;
+      text-decoration:none;
+      color:#fff;
+      background: var(--btn-grad);
+      border-radius: 12px;
+      font-weight: 600;
+      letter-spacing:.01em;
+      box-shadow: 0 8px 22px rgba(56, 92, 255, .25);
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(56, 92, 255, .35); filter:saturate(110%) }
+    .btn:focus-visible{ outline:none; box-shadow: var(--ring) }
+
+    /* 푸터 */
+    footer{
+      text-align:center; color:var(--muted);
+      font-size:13px; padding:40px 0 24px;
+    }
+
+    /* 모달 */
+    #modal{
+      display:none; position:fixed; inset:0;
+      background: rgba(6,10,22,.55);
+      backdrop-filter: blur(6px);
+      align-items:center; justify-content:center; padding: 24px;
+      z-index:50;
+    }
+    .modal-card{
+      width: 100%; max-width: 360px;
+      background: var(--bg-soft);
+      color: var(--text);
+      border: var(--glass-border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 22px 22px 18px;
+      animation: pop .18s ease;
+    }
+    @keyframes pop{ from{ transform: scale(.98); opacity:.6 } to{ transform: scale(1); opacity:1 } }
+    .modal-card h3{ margin:0 0 8px; font-size:18px }
+    .modal-card p{ margin:0 0 14px; color:var(--muted); font-size:14px }
+    .input{
+      width:100%; padding:12px 14px; border-radius:10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .input::placeholder{ color: #8b93ae }
+    .input:focus{ border-color: rgba(138,208,255,.6); box-shadow: var(--ring) }
+    .row{ display:flex; gap:10px; margin-top:14px }
+    .ghost{
+      flex:1; padding:12px 14px; border-radius:10px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: transparent; color: var(--text); font-weight:600; cursor:pointer;
+    }
+    .primary{
+      flex:1; padding:12px 14px; border-radius:10px;
+      border: none; cursor:pointer; font-weight:700; color:#fff;
+      background: var(--btn-grad);
+      box-shadow: 0 8px 22px rgba(56, 92, 255, .25);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .primary:hover{ transform: translateY(-1px); box-shadow: 0 12px 28px rgba(56, 92, 255, .35); }
+    .error-shake{ animation: shake .18s ease 0s 2 }
+    @keyframes shake{ 0%{transform: translateX(0)} 25%{transform: translateX(-6px)} 50%{transform: translateX(6px)} 100%{transform: translateX(0)} }
+
+    /* 상단 우측 트리거(숨김) */
+    .top-right{
+      position:fixed; top:16px; right:18px; z-index:10;
+    }
+    .secret-btn{
+      width:40px; height:40px; background:none; border:none; opacity:0; cursor:pointer;
+    }
+
+    /* 반응형 */
+    @media (max-width:768px){
+      .header{ padding:58px 20px 36px }
+      .card{ padding:22px }
+      .title{ font-size: clamp(30px, 6vw, 44px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 우측 상단 비밀 버튼(시각적 비노출) -->
+  <div class="top-right">
+    <button class="secret-btn" aria-label="비밀 다운로드 열기"></button>
+  </div>
+
+  <header class="header" role="banner">
+    <h1 class="title">자료 다운로드</h1>
+    <p class="subtitle">자주 쓰는 설치 파일과 공식 드라이버를 한곳에 모았습니다.</p>
+  </header>
+
+  <main class="container" role="main">
+    <!-- 애니데스크 -->
+    <section class="card" aria-labelledby="sec-anydesk">
+      <h2 id="sec-anydesk">anydesk 원격</h2>
+      <div class="btn-grid">
+        <a class="btn" href="http://gofile.me/77IzP/VeNbOcrrF" target="_blank" rel="noopener">anydesk 다운로드</a>
+
+        <a class="btn" href="https://anydesk.com/ko/downloads/thank-you?dv=win_exe">(1,2 다운안될시)  다운로드</a>
+      </div>
+    </section>
+
+    <!-- 메인보드 공식 드라이버 -->
+    <section class="card" aria-labelledby="sec-mb">
+      <h2 id="sec-mb">메인보드 공식 드라이버</h2>
+      <div class="btn-grid">
+        <a class="btn" href="https://kr.msi.com/support" target="_blank" rel="noopener">MSI</a>
+        <a class="btn" href="https://www.gigabyte.com/kr/Support/Consumer" target="_blank" rel="noopener">기가바이트</a>
+        <a class="btn" href="https://www.asus.com/kr/support/download-center/" target="_blank" rel="noopener">ASUS</a>
+        <a class="btn" href="https://www.ecs.com.tw/kr/Product/Motherboard" target="_blank" rel="noopener">ECS</a>
+        <a class="btn" href="https://www.asrock.com/support/index.kr.asp" target="_blank" rel="noopener">ASRock</a>
+      </div>
+    </section>
+
+    <!-- 3DP & 기타 -->
+    <section class="card" aria-labelledby="sec-3dp">
+      <h2 id="sec-3dp">3DP & 기타</h2>
+      <div class="btn-grid">
+        <a class="btn" href="http://gofile.me/77IzP/SBtPtD5os" target="_blank" rel="noopener">3DP Chip</a>
+        <a class="btn" href="http://gofile.me/77IzP/8ZBTv0Dne" target="_blank" rel="noopener">3DP Net</a>
+        <a class="btn" href="http://gofile.me/77IzP/T4IGEl856" target="_blank" rel="noopener">인텔 Chipset</a>
+        <a class="btn" href="http://gofile.me/77IzP/1gXyNdhGW" target="_blank" rel="noopener">캐논 드라이버</a>
+      </div>
+    </section>
+
+    <!-- 고급 다운로드 (초기 숨김) -->
+    <section id="advancedSection" class="card" style="display:none" aria-labelledby="sec-adv">
+      <h2 id="sec-adv">다운로드</h2>
+      <div class="btn-grid">
+        <a class="btn" href="http://gofile.me/77IzP/THuH91fij" target="_blank" rel="noopener">10</a>
+        <a class="btn" href="http://gofile.me/77IzP/IKpt8LWUM" target="_blank" rel="noopener">11</a>
+        <a class="btn" href="http://gofile.me/77IzP/kJQmc8GRs" target="_blank" rel="noopener">인증</a>
+        <a class="btn" href="http://gofile.me/77IzP/RndK4CEMR" target="_blank" rel="noopener">HDD</a>
+        <a class="btn" href="http://gofile.me/77IzP/IOI9CA28j" target="_blank" rel="noopener">off</a>
+        <a class="btn" href="http://gofile.me/77IzP/gtUWHb8N5" target="_blank" rel="noopener">pri</a>
+        <a class="btn" href="http://gofile.me/77IzP/5Lm0zwLhj" target="_blank" rel="noopener">20250915</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 IT79 자료 페이지
+  </footer>
+
+  <!-- 비밀번호 입력 모달 -->
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card" id="modalCard">
+      <h3 id="modalTitle">비밀번호를 입력하세요</h3>
+      <p>고급 다운로드 접근을 위해 인증이 필요합니다.</p>
+      <input class="input" type="password" id="modalPassword" placeholder="비밀번호" autocomplete="current-password" />
+      <div class="row">
+        <button class="ghost" id="closeModalBtn" type="button">닫기</button>
+        <button class="primary" id="confirmPwdBtn" type="button">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === 설정 ===
+    const correctPassword = "7993"; // 클라이언트 하드코딩은 노출될 수 있으니 민감한 보안용으로는 사용 금지
+
+    // === 엘리먼트 ===
+    const modal = document.getElementById('modal');
+    const modalCard = document.getElementById('modalCard');
+    const pwdInput = document.getElementById('modalPassword');
+    const adv = document.getElementById('advancedSection');
+    const secretBtn = document.querySelector('.secret-btn');
+    const confirmBtn = document.getElementById('confirmPwdBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    // === 모달 열기/닫기 ===
+    function openModal(){
+      modal.style.display = 'flex';
+      setTimeout(()=>{ pwdInput.focus(); }, 0);
+    }
+    function closeModal(){
+      modal.style.display = 'none';
+      pwdInput.value = '';
+      modalCard.classList.remove('error-shake');
+    }
+
+    // 트리거: 숨은 버튼 클릭 / 단축키 / ESC / Enter
+    secretBtn.addEventListener('click', openModal);
+    document.addEventListener('keydown', (e)=>{
+      if(e.shiftKey && (e.key === 'D' || e.key === 'd')) openModal(); // Shift + D
+      if(e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+      if(e.key === 'Enter' && modal.style.display === 'flex') verifyPassword();
+    });
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+    closeModalBtn.addEventListener('click', closeModal);
+
+    // 비밀번호 검증
+    function verifyPassword(){
+      if(pwdInput.value === correctPassword){
+        closeModal();
+        adv.style.display = 'block';
+        adv.scrollIntoView({ behavior:'smooth', block:'start' });
+      }else{
+        modalCard.classList.remove('error-shake');
+        void modalCard.offsetWidth; // reflow for animation
+        modalCard.classList.add('error-shake');
+        pwdInput.select();
+        alert("비밀번호가 올바르지 않습니다.");
+      }
+    }
+    confirmBtn.addEventListener('click', verifyPassword);
+  </script>
+
+</body>
+</html>
